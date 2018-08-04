@@ -12,6 +12,9 @@ class PathResolver
         $container = $schema;
         while ($key = array_shift($pathParts)) {
             $container = $container->{$key};
+            if ($this->isRef($container)) {
+                $container = $this->getRefValue($schema, $container->{'$ref'});
+            }
         }
 
         return $container;
@@ -56,6 +59,11 @@ class PathResolver
     public function isRefKey(string $key): bool
     {
         return preg_match('~\$ref~', $key);
+    }
+
+    public function isRef(\stdClass $schema): bool
+    {
+        return !empty($schema->{'$ref'});
     }
 
     public function getRefValue(\stdClass $schema, string $link): \stdClass
