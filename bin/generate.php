@@ -6,7 +6,7 @@ $baseDir = realpath(dirname(__FILE__) . '/..');
 require_once $baseDir . '/vendor/autoload.php';
 
 $options = [
-    'schema' => $baseDir . '/examples/petstore.json',
+    'schema' => $baseDir . '/examples/petstore.deref.json',
     'output' => $baseDir . '/output/',
 ];
 
