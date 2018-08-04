@@ -7,6 +7,13 @@ class DeRef
 
     private $refs = [];
 
+    private $pathResolver;
+
+    public function __construct()
+    {
+        $this->pathResolver = new PathResolver();
+    }
+
     public function deref(array $options): array
     {
         $schema = $options['schema'];
@@ -26,58 +33,25 @@ class DeRef
 
     private function findRefs(array $schema, string $path = '')
     {
-        if (is_array($schema)) {
-            foreach ($schema as $key => $value) {
-                if (is_array($value)) {
-                    $this->findRefs($value, $path . '/' . $this->escapeKey($key));
-                } elseif (preg_match('~\$ref~', $key)) {
-                    $this->refs[$path] = $value;
-                }
+        foreach ($schema as $key => $value) {
+            if (is_array($value)) {
+                $this->findRefs($value, $path . '/' . $this->pathResolver->escapeKey($key));
+            } elseif ($this->pathResolver->isRefKey($key)) {
+                $this->refs[$path] = $value;
             }
         }
-    }
-
-    private function escapeKey(string $key): string
-    {
-        return str_replace('/', '\\/', $key);
-    }
-
-    private function unescapeKey(string $key): string
-    {
-        return str_replace('\\/', '/', $key);
-    }
-
-    private function unescapeKeys(array $keys): array
-    {
-        foreach ($keys as &$key) {
-            $key = $this->unescapeKey($key);
-        }
-        return $keys;
     }
 
     private function replaceRef(\stdClass $schema, string $path, string $link): void
     {
-        $newValue = $schema;
-        $link = ltrim($link, '#/');
-        $pathParts = explode('/', $link);
+        $newValue = $this->pathResolver->getRefValue($schema, $link);
 
-        while ($key = array_shift($pathParts)) {
-            $newValue = $newValue->{$key};
-        }
+        $pathParts = $this->pathResolver->explodePathParts($path);
+        $refKey = array_pop($pathParts);
+        $parentPath = $this->pathResolver->implodePathParts($pathParts);
 
-        $container = $schema;
-        $pathParts = preg_split('#(?<!\\\)\/#', $path);
-        $pathParts = array_filter($pathParts);
-        $pathParts = $this->unescapeKeys($pathParts);
-
-        while ($key = array_shift($pathParts)) {
-            if (!count($pathParts)) {
-                $container->{$key} = $newValue;
-                break;
-            } else {
-                $container = $container->{$key};
-            }
-        }
+        $container = $this->pathResolver->get($schema, $parentPath);
+        $container->{$refKey} = $newValue;
     }
 
 }
