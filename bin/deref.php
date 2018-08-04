@@ -10,9 +10,9 @@ $options = [
     'destination' => $baseDir . '/output/petstore.deref.json',
 ];
 
-$generator = new \OpenApiDataProvider\DeRef();
+$deref = new \OpenApiDataProvider\DeRef();
 
-$result = $generator->deref($options);
+$result = $deref->deref($options);
 
 $destination = $options['destination'];
 if (!file_exists(dirname($destination))) {

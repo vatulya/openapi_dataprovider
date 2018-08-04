@@ -28,7 +28,7 @@ class DeRef
             $this->replaceRef($schemaObject, $path, $link);
         }
 
-        return (array)$schemaObject;
+        return json_decode(json_encode($schemaObject), true);
     }
 
     private function findRefs(array $schema, string $path = '')
