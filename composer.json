@@ -10,6 +10,8 @@
         "generate": "php bin/generate.php"
     },
     "require": {
+
+        "ext-json": "*",
         "mustache/mustache": "^2.12"
     },
     "autoload": {
