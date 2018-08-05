@@ -5,27 +5,80 @@ namespace OpenApiDataProvider;
 class Generator
 {
 
-    private $result = '';
-
     public function generate(array $options): void
     {
         $schema = $options['schema'];
         $output = $options['output'];
 
-        $m = new \Mustache_Engine([
+        $schema = json_decode(file_get_contents($schema), true);
+
+
+        $parameter = [
+            'namespace' => 'OpenApiDataProvider',
+            'className' => 'BooleanParameterExample',
+            'positiveCases' => [
+                [
+                    'caseName' => 'TrueValue',
+                    'caseValue' => 'true',
+                ],
+                [
+                    'caseName' => 'FalseValue',
+                    'caseValue' => 'false',
+                ],
+            ],
+            'negativeCases' => [
+                [
+                    'caseName' => 'NullValue',
+                    'caseValue' => 'null',
+                ],
+                [
+                    'caseName' => 'ArrayValue',
+                    'caseValue' => '[]',
+                ],
+            ],
+            'testPositive' => <<<TEST
+\$v = v::boolType();
+foreach (\$this->object->getPositiveCasesValues() as \$caseName => \$positiveCaseValue) {
+    if (!\$v->validate(\$positiveCaseValue)) {
+        throw new \Exception('Wrong Positive case: "' . \$caseName . '"');
+    }
+}
+TEST
+            ,
+            'testNegative' => <<<TEST
+\$v = v::boolType();
+foreach (\$this->object->getNegativeCasesValues() as \$caseName => \$negativeCaseValue) {
+    if (\$v->validate(\$negativeCaseValue)) {
+        throw new \Exception('Wrong Negative case: "' . \$caseName . '"');
+    }
+}
+TEST
+            ,
+
+        ];
+
+
+
+        $mustache = new \Mustache_Engine([
             'loader' => new \Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/../templates'),
         ]);
-        $this->result = $m->render('index', ['schema' => $schema]);
 
-        $destination = $output . 'index.php';
+        $result = $mustache->render('parameter', $parameter);
 
+        $destination = $output . 'parameter.php';
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0777, true);
         }
-        file_put_contents($destination, $this->result);
+        file_put_contents($destination, $result);
 
-        echo $destination;
-        echo $this->result;
+        $result = $mustache->render('parameterTest', $parameter);
+
+        $destination = $output . 'parameterTest.php';
+        if (!file_exists(dirname($destination))) {
+            mkdir(dirname($destination), 0777, true);
+        }
+        file_put_contents($destination, $result);
+
     }
 
 }

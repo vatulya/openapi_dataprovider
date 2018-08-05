@@ -1,0 +1,23 @@
+<?php
+
+namespace {{namespace}};
+
+use Respect\Validation\Validator as v;
+
+class {{className}}Test {
+
+    protected $object;
+
+    public function __construct() {
+        $this->object = new {{className}}();
+    }
+
+    public function testPositiveCases() {
+        {{&testPositive}}
+    }
+
+    public function testNegativeCases() {
+        {{&testNegative}}
+    }
+
+}

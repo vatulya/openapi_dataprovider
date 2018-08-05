@@ -14,7 +14,7 @@ class DeRef
         $this->pathResolver = new PathResolver();
     }
 
-    public function deref(array $options): array
+    public function deref(array $options): void
     {
         $schema = $options['schema'];
 
@@ -28,7 +28,13 @@ class DeRef
             $this->replaceRef($schemaObject, $path, $link);
         }
 
-        return json_decode(json_encode($schemaObject), true);
+        $result = json_decode(json_encode($schemaObject), true);
+
+        $destination = $options['destination'];
+        if (!file_exists(dirname($destination))) {
+            mkdir(dirname($destination), 0777, true);
+        }
+        file_put_contents($destination, json_encode($result));
     }
 
     private function findRefs(array $schema, string $path = '')

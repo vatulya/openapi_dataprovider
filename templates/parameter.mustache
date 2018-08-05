@@ -1,0 +1,51 @@
+<?php
+
+namespace {{namespace}};
+
+class {{className}} {
+
+    protected $positiveCases = [
+    {{#positiveCases}}
+        '{{caseName}}',
+    {{/positiveCases}}
+    ];
+    protected $negativeCases = [];
+
+
+    {{#positiveCases}}
+    public function {{caseName}}Case() {
+        return {{caseValue}};
+    }
+    {{/positiveCases}}
+
+    {{#negativeCases}}
+    public function {{caseName}}Case() {
+        return {{caseValue}};
+    }
+    {{/negativeCases}}
+
+    public function getPositiveCases(): array {
+        return $this->positiveCases;
+    }
+
+    public function getPositiveCasesValues(): array {
+        $values = [];
+        foreach ($this->positiveCases as $case) {
+            $values[$case] = $this->{$case . 'Case'}();
+        }
+        return $values;
+    }
+
+    public function getNegativeCases(): array {
+        return $this->negativeCases;
+    }
+
+    public function getNegativeCasesValues(): array {
+        $values = [];
+        foreach ($this->negativeCases as $case) {
+            $values[$case] = $this->{$case . 'Case'}();
+        }
+        return $values;
+    }
+
+}

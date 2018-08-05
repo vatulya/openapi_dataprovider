@@ -10,12 +10,6 @@ $options = [
     'output' => $baseDir . '/output/',
 ];
 
-$schema = file_get_contents($options['schema']);
-$schema = json_decode($schema, true);
-
 $generator = new \OpenApiDataProvider\Generator();
 
-$generator->generate([
-    'schema' => $schema,
-    'output' => $options['output'],
-]);
+$generator->generate($options);

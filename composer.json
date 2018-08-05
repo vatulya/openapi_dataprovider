@@ -8,12 +8,14 @@
     ],
     "scripts": {
         "deref": "php bin/deref.php",
-        "generate": "php bin/generate.php"
+        "generate": "php bin/generate.php",
+        "generateTest": "php bin/generateTest.php"
     },
     "require": {
 
         "ext-json": "*",
-        "mustache/mustache": "^2.12"
+        "mustache/mustache": "^2.12",
+        "respect/validation": "^1.1"
     },
     "autoload": {
         "psr-4": {"OpenApiDataProvider\\": "src/"}
